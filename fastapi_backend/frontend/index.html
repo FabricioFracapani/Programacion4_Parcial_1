@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP4 - Catálogo de Productos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>TP4 - Catálogo de Productos</h1>
+        <div class="header-controls">
+            <label class="switch-dark">
+                <span>Modo Oscuro</span>
+                <input type="checkbox" id="switch-dark-mode">
+                <span class="slider"></span>
+            </label>
+            <nav>
+                <button class="nav-btn active" data-view="productos">Gestión Productos</button>
+                <button class="nav-btn" data-view="categorias">Gestión Categorías</button>
+                <button class="nav-btn" data-view="ingredientes">Gestión Ingredientes</button>
+                <button class="nav-btn" data-view="catalogo">Catálogo</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Vista Productos -->
+        <section id="productos-view" class="view active">
+            <div class="section-header">
+                <h2>Gestión de Productos</h2>
+                <button id="btn-crear-producto" class="btn btn-primary">+ Nuevo Producto</button>
+            </div>
+            <div id="productos-table-container"></div>
+        </section>
+
+        <!-- Vista Categorías -->
+        <section id="categorias-view" class="view">
+            <div class="section-header">
+                <h2>Gestión de Categorías</h2>
+                <button id="btn-crear-categoria" class="btn btn-primary">+ Nueva Categoría</button>
+            </div>
+            <div id="categorias-table-container"></div>
+        </section>
+
+        <!-- Vista Ingredientes -->
+        <section id="ingredientes-view" class="view">
+            <div class="section-header">
+                <h2>Gestión de Ingredientes</h2>
+                <button id="btn-crear-ingrediente" class="btn btn-primary">+ Nuevo Ingrediente</button>
+            </div>
+            <div id="ingredientes-table-container"></div>
+        </section>
+
+        <!-- Vista Catálogo -->
+        <section id="catalogo-view" class="view">
+            <div class="section-header">
+                <h2>Catálogo de Productos</h2>
+                <select id="filtro-categoria">
+                    <option value="">Todas las categorías</option>
+                </select>
+            </div>
+            <div id="catalogo-grid"></div>
+        </section>
+    </main>
+
+    <!-- Modal Producto -->
+    <div id="modal-producto" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 id="modal-producto-title">Nuevo Producto</h3>
+            <form id="form-producto">
+                <input type="hidden" id="producto-id">
+                <div class="form-group">
+                    <label for="producto-nombre">Nombre *</label>
+                    <input type="text" id="producto-nombre" required minlength="2" maxlength="150">
+                </div>
+                <div class="form-group">
+                    <label for="producto-descripcion">Descripción</label>
+                    <textarea id="producto-descripcion"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="producto-categoria">Categoría Principal *</label>
+                    <select id="producto-categoria" required>
+                        <option value="">Seleccionar categoría...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Categorías Adicionales</label>
+                    <div id="categorias-adicionales" class="checkbox-list"></div>
+                </div>
+                <div class="form-group">
+                    <label for="producto-ingredientes">Ingredientes</label>
+                    <div id="ingredientes-disponibles" class="checkbox-list"></div>
+                </div>
+                <div class="form-group">
+                    <label for="producto-precio">Precio Base *</label>
+                    <input type="number" id="producto-precio" required step="0.01" min="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="producto-stock">Stock</label>
+                    <input type="number" id="producto-stock" value="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="producto-imagen">URL de Imagen</label>
+                    <input type="text" id="producto-imagen" placeholder="https://ejemplo.com/imagen.jpg">
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="producto-disponible" checked>
+                    <label for="producto-disponible">Disponible</label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Categoría -->
+    <div id="modal-categoria" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 id="modal-categoria-title">Nueva Categoría</h3>
+            <form id="form-categoria">
+                <input type="hidden" id="categoria-id">
+                <div class="form-group">
+                    <label for="categoria-nombre">Nombre *</label>
+                    <input type="text" id="categoria-nombre" required minlength="2" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label for="categoria-descripcion">Descripción</label>
+                    <textarea id="categoria-descripcion"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="categoria-padre">Categoría Padre</label>
+                    <select id="categoria-padre">
+                        <option value="">Ninguna</option>
+                    </select>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="categoria-principal">
+                    <label for="categoria-principal">Es categoría principal</label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Ingrediente -->
+    <div id="modal-ingrediente" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 id="modal-ingrediente-title">Nuevo Ingrediente</h3>
+            <form id="form-ingrediente">
+                <input type="hidden" id="ingrediente-id">
+                <div class="form-group">
+                    <label for="ingrediente-nombre">Nombre *</label>
+                    <input type="text" id="ingrediente-nombre" required minlength="2" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label for="ingrediente-descripcion">Descripción</label>
+                    <textarea id="ingrediente-descripcion"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="ingrediente-precio">Precio Adicional</label>
+                    <input type="number" id="ingrediente-precio" step="0.01" min="0" value="0">
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="ingrediente-disponible" checked>
+                    <label for="ingrediente-disponible">Disponible</label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Eliminar -->
+    <div id="modal-confirmar" class="modal">
+        <div class="modal-content modal-small">
+            <h3>Confirmar Eliminación</h3>
+            <p id="mensaje-eliminar"></p>
+            <div class="form-actions">
+                <button id="btn-confirmar-eliminar" class="btn btn-danger">Eliminar</button>
+                <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- Panel Debug -->
+    <div id="debug-panel">
+        <div class="debug-header">
+            <h3>Debug Console</h3>
+            <button id="btn-clear-debug" class="btn btn-sm btn-secondary">Limpiar</button>
+        </div>
+        <div id="debug-logs"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

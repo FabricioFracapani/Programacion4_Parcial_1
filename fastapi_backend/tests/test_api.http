@@ -1,0 +1,89 @@
+@baseUrl = http://127.0.0.1:8000
+
+##Categoria
+
+### creamos una categoria
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre" : "Ofertas",
+  "descripcion" : "Ofertas y promociones especiales"
+}
+
+### listamos las categorias
+GET {{baseUrl}}/categorias/
+
+### eliminar categoria
+DELETE {{baseUrl}}/categorias/1
+
+###Producto
+
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre" : "pizza muzzarella",
+  "descripcion" : "Deliciosa pizza con muzzarella y salsa de tomate",
+  "precio_base": 1500.00,
+  "stock_cantidad": 10
+}
+
+### update producto
+PATCH   {{baseUrl}}/productos/1
+Content-Type: application/json
+
+{
+  "stock_cantidad": 10
+}
+
+### listar productos
+GET {{baseUrl}}/productos/
+
+
+### eliminar producto
+DELETE {{baseUrl}}/productos/1
+
+
+###ingrediente
+
+### crear ingrediente
+POST {{baseUrl}}/ingredientes/
+Content-Type: application/json
+
+{
+  "nombre" : "salsa de tomate",
+  "descripcion" : "Salsa de tomate fresca y deliciosa"
+}
+
+### actualizar ingrediente
+PATCH {{baseUrl}}/ingredientes/1
+Content-Type: application/json
+
+{
+  "es_alergeno": true
+}
+### listar ingredientes
+GET {{baseUrl}}/ingredientes/
+
+
+### crear relacion producto-categoria
+POST {{baseUrl}}/productos/categorias
+Content-Type: application/json
+
+{
+  "producto_id": 1,
+  "categoria_id": 6,
+  "es_principal": true
+}
+
+
+### crear relacion producto-ingrediente
+POST {{baseUrl}}/productos/ingredientes
+Content-Type: application/json
+
+{
+  "producto_id": 1,
+  "ingrediente_id": 1,
+  "es_removible": true
+}
