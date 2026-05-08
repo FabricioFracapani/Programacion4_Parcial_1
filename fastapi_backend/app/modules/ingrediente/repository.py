@@ -37,29 +37,36 @@ class IngredienteRepository(BaseRepository[Ingrediente]):
 
     def get_all_paged(self, offset: int = 0, limit: int = 20) -> list[Ingrediente]:
         """
-        Obtiene ingredientes con paginación.
+        Obtiene ingredientes activos con paginación.
 
         Args:
             offset (int): Cantidad de registros a omitir.
             limit (int): Máximo de registros a devolver.
 
         Returns:
-            list[Ingrediente]: Lista de ingredientes.
+            list[Ingrediente]: Lista de ingredientes activos.
         """
         return list(
             self.session.exec(
-                select(Ingrediente).offset(offset).limit(limit)
+                select(Ingrediente)
+                .where(Ingrediente.activo == True)  # noqa: E712
+                .offset(offset)
+                .limit(limit)
             ).all()
         )
 
     def count(self) -> int:
         """
-        Cuenta la cantidad total de ingredientes.
+        Cuenta la cantidad total de ingredientes activos.
 
         Returns:
-            int: Total de registros en la tabla Ingrediente.
+            int: Total de registros activos en la tabla Ingrediente.
         """
-        return len(self.session.exec(select(Ingrediente)).all())
+        return len(
+            self.session.exec(
+                select(Ingrediente).where(Ingrediente.activo == True)  # noqa: E712
+            ).all()
+        )
 
 
 class ProductoIngredienteRepository(BaseRepository[ProductoIngrediente]):

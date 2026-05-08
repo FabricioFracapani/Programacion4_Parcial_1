@@ -4,6 +4,13 @@ let currentView = 'productos';
 let deleteTarget = null;
 let debugLogs = [];
 
+function toggleDebug() {
+    const btn = document.getElementById('btn-toggle-debug');
+    const logs = document.getElementById('debug-logs');
+    logs.classList.toggle('hidden');
+    btn.textContent = logs.classList.contains('hidden') ? 'Mostrar' : 'Ocultar';
+}
+
 const API = {
     async request(endpoint, options = {}) {
         const url = `${API_BASE}${endpoint}`;
@@ -65,7 +72,7 @@ const API = {
             return API.request(`/productos/${id}`, { method: 'PATCH', body: data });
         },
         delete(id) {
-            return API.request(`/productos/${id}`, { method: 'DELETE' });
+            return API.request(`/productos/${id}/desactivar`, { method: 'DELETE' });
         },
         getCategorias() {
             return API.request('/productos/categorias');
@@ -571,12 +578,14 @@ function renderCatalogo(productos, categorias, relacionesCategorias, relacionesI
         return;
     }
     
+    const PLACEHOLDER_SIN_IMAGEN = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiBmb250LXNpemU9IjIwIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+U2luIEltYWdlbjwvdGV4dD48L3N2Zz4=';
+    
     let html = '<div class="catalogo-grid">';
     
     productosFiltrados.forEach(p => {
         const imgUrl = p.imagen_url && p.imagen_url.length > 0 
             ? p.imagen_url[0] 
-            : 'https://via.placeholder.com/300x200?text=Sin+Imagen';
+            : PLACEHOLDER_SIN_IMAGEN;
         
         const catsIds = relacionesCategorias.data
             .filter(r => r.producto_id === p.id)
@@ -592,7 +601,7 @@ function renderCatalogo(productos, categorias, relacionesCategorias, relacionesI
             .map(r => r.ingrediente_id);
         
         html += `<div class="catalogo-card">
-            <img src="${imgUrl}" alt="${p.nombre}" class="catalogo-img" onerror="this.src='https://via.placeholder.com/300x200?text=Sin+Imagen'">
+            <img src="${imgUrl}" alt="${p.nombre}" class="catalogo-img" onerror="this.src='${PLACEHOLDER_SIN_IMAGEN}'">
             <div class="catalogo-content">
                 <h3>${p.nombre}</h3>
                 <p class="catalogo-desc">${p.descripcion || 'Sin descripción'}</p>

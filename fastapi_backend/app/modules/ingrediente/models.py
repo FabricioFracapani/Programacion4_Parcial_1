@@ -15,6 +15,11 @@ class Ingrediente(SQLModel, table=True):
     nombre: str = Field(unique=True, max_length=100)
     descripcion: Optional[str] = Field(default=None)
     es_alergeno: bool = Field(default=False)
+    activo: bool = Field(default=True)
+    deleted_at: Optional[datetime] = Field(
+        default=None,
+        sa_type=DateTime(timezone=True)
+    )
 
     created_at: datetime = Field(
         default_factory=datetime.utcnow,

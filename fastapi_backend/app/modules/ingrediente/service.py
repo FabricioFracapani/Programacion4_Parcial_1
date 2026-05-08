@@ -226,14 +226,17 @@ class IngredienteService:
 
     def soft_delete(self, ingrediente_id: int) -> None:
         """
-        Elimina físicamente un ingrediente.
+        Realiza un borrado lógico del ingrediente.
 
         Args:
             ingrediente_id (int): ID del ingrediente.
         """
         with IngredienteUnitOfWork(self._session) as uow:
             ingrediente = self._get_or_404(uow, ingrediente_id)
-            uow.ingredientes.delete(ingrediente)
+            ingrediente.activo = False
+            ingrediente.deleted_at = _now()
+            ingrediente.updated_at = _now()
+            uow.ingredientes.add(ingrediente)
 
     # ── Casos de uso: ProductoIngrediente ────────────────────────────────────
 
