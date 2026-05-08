@@ -422,6 +422,15 @@ tr:last-child td {
     margin: 0;
 }
 
+.debug-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#debug-logs.hidden {
+    display: none;
+}
+
 #debug-logs {
     padding: 0.5rem;
 }

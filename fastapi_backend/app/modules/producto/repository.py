@@ -14,28 +14,36 @@ class ProductoRepository(BaseRepository[Producto]):
         super().__init__(session, Producto)
 
     def get_all_paged(self, offset: int = 0, limit: int = 20) -> list[Producto]:
-        """Obtiene todos los productos con paginación."""
+        """Obtiene todos los productos disponibles con paginación."""
         return list(
             self.session.exec(
-                select(Producto).offset(offset).limit(limit)
+                select(Producto)
+                .where(Producto.disponible == True)  # noqa: E712
+                .offset(offset)
+                .limit(limit)
             ).all()
         )
 
     def get_by_categoria(self, categoria_id: int, offset: int = 0, limit: int = 20) -> list[Producto]:
-        """Obtiene productos que pertenecen a una categoría específica."""
+        """Obtiene productos disponibles que pertenecen a una categoría específica."""
         return list(
             self.session.exec(
                 select(Producto)
                 .join(ProductoCategoria)
                 .where(ProductoCategoria.categoria_id == categoria_id)
+                .where(Producto.disponible == True)  # noqa: E712
                 .offset(offset)
                 .limit(limit)
             ).all()
         )
 
     def count(self) -> int:
-        """Cuenta la cantidad total de productos."""
-        return len(self.session.exec(select(Producto)).all())
+        """Cuenta la cantidad total de productos disponibles."""
+        return len(
+            self.session.exec(
+                select(Producto).where(Producto.disponible == True)  # noqa: E712
+            ).all()
+        )
 
 
 class ProductoCategoriaRepository(BaseRepository[ProductoCategoria]):

@@ -199,7 +199,10 @@
     <div id="debug-panel">
         <div class="debug-header">
             <h3>Debug Console</h3>
-            <button id="btn-clear-debug" class="btn btn-sm btn-secondary">Limpiar</button>
+            <div class="debug-controls">
+                <button id="btn-toggle-debug" class="btn btn-sm btn-secondary" onclick="toggleDebug()">Ocultar</button>
+                <button id="btn-clear-debug" class="btn btn-sm btn-secondary">Limpiar</button>
+            </div>
         </div>
         <div id="debug-logs"></div>
     </div>
