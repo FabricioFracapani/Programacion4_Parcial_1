@@ -4,10 +4,11 @@ from sqlmodel import create_engine, Session, SQLModel
 
 load_dotenv()
 
-# Imporpip install -r requirements.txttar todos los modelos para que SQLModel los registre y cree las tablas
+# Importar todos los modelos para que SQLModel los registre y cree las tablas
 from app.modules.producto.models import Producto, ProductoCategoria, ProductoIngrediente
 from app.modules.categoria.models import Categoria
 from app.modules.ingrediente.models import Ingrediente
+from app.modules.auth.models import Usuario
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",

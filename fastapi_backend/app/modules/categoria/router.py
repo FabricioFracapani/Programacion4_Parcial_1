@@ -4,12 +4,13 @@ from fastapi import APIRouter, Depends, Query, Path, status
 from sqlmodel import Session
 
 from app.core.database import get_session
+from app.modules.auth.dependencies import get_current_user
 from app.modules.categoria.schemas import (
     CategoriaCreate, CategoriaPublic, CategoriaUpdate, CategoriaList
 )
 from app.modules.categoria.service import CategoriaService
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 def get_categoria_service(session: Session = Depends(get_session)) -> CategoriaService:

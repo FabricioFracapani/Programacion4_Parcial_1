@@ -4,13 +4,14 @@ from fastapi import APIRouter, Depends, Query, Path, status
 from sqlmodel import Session
 
 from app.core.database import get_session
+from app.modules.auth.dependencies import get_current_user
 from app.modules.ingrediente.schemas import (
     IngredienteCreate, IngredientePublic, IngredienteUpdate, IngredienteList,
     ProductoIngredienteCreate, ProductoIngredientePublic, ProductoIngredienteList
 )
 from app.modules.ingrediente.service import IngredienteService
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 def get_ingrediente_service(session: Session = Depends(get_session)) -> IngredienteService:
