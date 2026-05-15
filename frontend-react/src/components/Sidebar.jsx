@@ -4,20 +4,24 @@ import { useAuth } from '../context/AuthContext';
 export default function Sidebar({ isOpen, onClose, darkMode, onToggleDark, debugVisible, onToggleDebug, onLogout }) {
   const { user } = useAuth();
 
+  const displayName = user ? `${user.nombre} ${user.apellido}` : 'Invitado';
+  const displayRole = user?.roles?.[0] || 'CLIENT';
+  const avatarLetter = user?.nombre?.[0]?.toUpperCase() || '?';
+
   return (
     <>
       {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
       <aside className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-header">
-          <h2>PlanViejo</h2>
-          <button className="sidebar-close" onClick={onClose}>×</button>
+          <h2>Food Store</h2>
+          <button className="sidebar-close" onClick={onClose}>x</button>
         </div>
 
         <div className="sidebar-user">
-          <div className="sidebar-avatar">{user?.sub?.[0]?.toUpperCase() || '?'}</div>
+          <div className="sidebar-avatar">{avatarLetter}</div>
           <div className="sidebar-user-info">
-            <span className="sidebar-username">{user?.sub || 'Invitado'}</span>
-            <span className="sidebar-role">{user?.rol || 'USER'}</span>
+            <span className="sidebar-username">{displayName}</span>
+            <span className="sidebar-role">{displayRole}</span>
           </div>
         </div>
 
@@ -28,7 +32,7 @@ export default function Sidebar({ isOpen, onClose, darkMode, onToggleDark, debug
           </NavLink>
           <NavLink to="/categorias" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={onClose}>
             <span className="sidebar-icon">📁</span>
-            Categorías
+            Categorias
           </NavLink>
           <NavLink to="/ingredientes" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={onClose}>
             <span className="sidebar-icon">🥚</span>
@@ -36,7 +40,15 @@ export default function Sidebar({ isOpen, onClose, darkMode, onToggleDark, debug
           </NavLink>
           <NavLink to="/catalogo" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={onClose}>
             <span className="sidebar-icon">🛒</span>
-            Catálogo
+            Catalogo
+          </NavLink>
+          <NavLink to="/pedidos" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={onClose}>
+            <span className="sidebar-icon">📋</span>
+            Pedidos
+          </NavLink>
+          <NavLink to="/direcciones" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={onClose}>
+            <span className="sidebar-icon">📍</span>
+            Direcciones
           </NavLink>
         </nav>
 
@@ -51,7 +63,7 @@ export default function Sidebar({ isOpen, onClose, darkMode, onToggleDark, debug
             <input type="checkbox" checked={debugVisible} onChange={onToggleDebug} />
             <span className="slider"></span>
           </label>
-          <button onClick={onLogout} className="btn btn-danger btn-full">Cerrar Sesión</button>
+          <button onClick={onLogout} className="btn btn-danger btn-full">Cerrar Sesion</button>
         </div>
       </aside>
     </>

@@ -126,4 +126,4 @@ def delete_ingrediente(
     ingrediente_id: Annotated[int, Path(gt=0, description="ID del ingrediente")],
     svc: IngredienteService = Depends(get_ingrediente_service),
 ) -> None:
-    svc.soft_delete(ingrediente_id)
+    svc.hard_delete(ingrediente_id)

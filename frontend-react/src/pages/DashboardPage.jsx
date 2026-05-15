@@ -10,13 +10,15 @@ import ProductosPage from './ProductosPage';
 import CategoriasPage from './CategoriasPage';
 import IngredientesPage from './IngredientesPage';
 import CatalogoPage from './CatalogoPage';
+import PedidosPage from './PedidosPage';
+import DireccionesPage from './DireccionesPage';
 
 export default function DashboardPage() {
   const { logout } = useAuth();
   const [toast, setToast] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true');
-  const [debugVisible, setDebugVisible] = useState(true);
+  const [debugVisible, setDebugVisible] = useState(false);
   const location = useLocation();
 
   function showToast(message, type = 'success') {
@@ -69,9 +71,11 @@ export default function DashboardPage() {
           <Route path="categorias" element={<CategoriasPage showToast={showToast} />} />
           <Route path="ingredientes" element={<IngredientesPage showToast={showToast} />} />
           <Route path="catalogo" element={<CatalogoPage showToast={showToast} />} />
+          <Route path="pedidos" element={<PedidosPage showToast={showToast} />} />
+          <Route path="direcciones" element={<DireccionesPage showToast={showToast} />} />
         </Routes>
       </main>
-      {/* <DebugPanel visible={debugVisible} /> */}
+     {/*  {debugVisible && <DebugPanel visible={debugVisible} />} */}
       {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
   );

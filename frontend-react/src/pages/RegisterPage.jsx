@@ -1,19 +1,23 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { API } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function RegisterPage() {
-  const [username, setUsername] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [celular, setCelular] = useState('');
   const [error, setError] = useState('');
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     try {
-      await API.auth.register(username, password);
-      navigate('/login', { replace: true, state: { message: 'Usuario creado correctamente' } });
+      await register(nombre, apellido, email, password, celular || undefined);
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err.message);
     }
@@ -22,17 +26,29 @@ export default function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>PlanViejo</h1>
+        <h1>Food Store</h1>
         <h2>Registrarse</h2>
         {error && <div className="auth-message error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Usuario</label>
-            <input type="text" value={username} onChange={e => setUsername(e.target.value)} required autoFocus />
+            <label>Nombre</label>
+            <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} required autoFocus />
           </div>
           <div className="form-group">
-            <label>Contraseña</label>
+            <label>Apellido</label>
+            <input type="text" value={apellido} onChange={e => setApellido(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Contrasena</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Celular (opcional)</label>
+            <input type="text" value={celular} onChange={e => setCelular(e.target.value)} />
           </div>
           <button type="submit" className="btn btn-primary btn-full">Registrarse</button>
         </form>
