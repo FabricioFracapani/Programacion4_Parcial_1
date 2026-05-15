@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Query, Path, status
 from sqlmodel import Session
 
 from app.core.database import get_session
+from app.modules.auth.dependencies import get_current_user
 from app.modules.producto.schemas import (
     ProductoCreate, ProductoPublic, ProductoUpdate, ProductoList,
     ProductoCategoriaCreate, ProductoCategoriaPublic, ProductoCategoriaList,
@@ -11,8 +12,7 @@ from app.modules.producto.schemas import (
 )
 from app.modules.producto.service import ProductoService
 
-router = APIRouter()
-
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 def get_producto_service(session: Session = Depends(get_session)) -> ProductoService:
     """Factory de dependencia: inyecta el servicio con su Session."""

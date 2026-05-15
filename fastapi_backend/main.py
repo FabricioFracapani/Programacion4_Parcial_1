@@ -8,6 +8,7 @@ from app.core.database import create_db_and_tables
 from app.modules.producto.router import router as producto_router
 from app.modules.categoria.router import router as categoria_router
 from app.modules.ingrediente.router import router as ingrediente_router
+from app.modules.auth.router import router as auth_router
 
 
 def create_app() -> FastAPI:
@@ -35,6 +36,7 @@ def create_app() -> FastAPI:
     app.include_router(producto_router, prefix="/productos", tags=["Productos"])
     app.include_router(categoria_router, prefix="/categorias", tags=["Categorias"])
     app.include_router(ingrediente_router, prefix="/ingredientes", tags=["Ingredientes"])
+    app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 
     # Ruta base (para test rápido)
     @app.get("/")
