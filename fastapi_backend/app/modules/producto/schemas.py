@@ -1,100 +1,81 @@
-# app/modules/producto/schemas.py
-#
-# Schemas Pydantic de entrada y salida para el módulo producto.
-# Separados del modelo de tabla para respetar el principio de
-# responsabilidad única: models.py define la DB, schemas.py define
-# los contratos HTTP.
 from typing import Optional, List
-from sqlmodel import SQLModel, Field
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 
-# ── Entrada Producto ──────────────────────────────────────────────────────────
-
-class ProductoCreate(SQLModel):
-    """Body para POST /productos/"""
+class ProductoCreate(BaseModel):
     nombre: str = Field(min_length=2, max_length=150)
     descripcion: Optional[str] = None
     precio_base: float = Field(gt=0)
-    imagen_url: List[str] = Field(default_factory=list)
+    imagenes_url: List[str] = Field(default_factory=list)
     stock_cantidad: int = Field(default=0, ge=0)
     disponible: bool = True
+    unidad_venta_id: Optional[int] = None
 
 
-class ProductoUpdate(SQLModel):
-    """Body para PATCH /productos/{id} — todos los campos opcionales."""
+class ProductoUpdate(BaseModel):
     nombre: Optional[str] = Field(default=None, min_length=2, max_length=150)
     descripcion: Optional[str] = None
     precio_base: Optional[float] = Field(default=None, gt=0)
-    imagen_url: Optional[List[str]] = None
+    imagenes_url: Optional[List[str]] = None
     stock_cantidad: Optional[int] = Field(default=None, ge=0)
     disponible: Optional[bool] = None
+    unidad_venta_id: Optional[int] = None
 
 
-# ── Salida Producto ───────────────────────────────────────────────────────────
-
-class ProductoPublic(SQLModel):
-    """Response model: campos que se exponen al cliente."""
+class ProductoPublic(BaseModel):
     id: int
     nombre: str
     descripcion: Optional[str] = None
     precio_base: float
-    imagen_url: List[str]
+    imagenes_url: List[str]
     stock_cantidad: int
     disponible: bool
+    unidad_venta_id: Optional[int] = None
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
 
 
-class ProductoList(SQLModel):
-    """Response model paginado para GET /productos/"""
+class ProductoList(BaseModel):
     data: List[ProductoPublic]
     total: int
 
 
-# ── Entrada ProductoCategoria ─────────────────────────────────────────────────
-
-class ProductoCategoriaCreate(SQLModel):
-    """Body para POST /productos/categorias"""
+class ProductoCategoriaCreate(BaseModel):
     producto_id: int = Field(gt=0)
     categoria_id: int = Field(gt=0)
     es_principal: bool = False
 
 
-# ── Salida ProductoCategoria ──────────────────────────────────────────────────
-
-class ProductoCategoriaPublic(SQLModel):
-    """Response model para la relación producto ↔ categoría."""
+class ProductoCategoriaPublic(BaseModel):
     producto_id: int
     categoria_id: int
     es_principal: bool
     created_at: datetime
 
 
-class ProductoCategoriaList(SQLModel):
-    """Response model para GET /productos/categorias"""
+class ProductoCategoriaList(BaseModel):
     data: List[ProductoCategoriaPublic]
     total: int
 
 
-class ProductoIngredienteCreate(SQLModel):
-    """Body para POST /productos/ingredientes"""
+class ProductoIngredienteCreate(BaseModel):
     producto_id: int = Field(gt=0)
     ingrediente_id: int = Field(gt=0)
+    cantidad: float = Field(default=1.0, gt=0)
+    unidad_medida_id: Optional[int] = None
     es_removible: bool = False
 
 
-# ── Salida ProductoIngrediente ────────────────────────────────────────────────
-
-class ProductoIngredientePublic(SQLModel):
-    """Response model para la relación producto ↔ ingrediente."""
+class ProductoIngredientePublic(BaseModel):
     producto_id: int
     ingrediente_id: int
+    cantidad: float
+    unidad_medida_id: Optional[int] = None
     es_removible: bool
 
 
-class ProductoIngredienteList(SQLModel):
-    """Response model para GET /productos/ingredientes"""
+class ProductoIngredienteList(BaseModel):
     data: List[ProductoIngredientePublic]
     total: int

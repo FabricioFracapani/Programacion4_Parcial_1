@@ -1,11 +1,10 @@
-# app/modules/ingrediente/models.py
 from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import DateTime
 from datetime import datetime
 
 if TYPE_CHECKING:
-    from app.modules.producto.models import Producto, ProductoIngrediente
+    from app.modules.producto.models import ProductoIngrediente
 
 
 class Ingrediente(SQLModel, table=True):
@@ -15,21 +14,8 @@ class Ingrediente(SQLModel, table=True):
     nombre: str = Field(unique=True, max_length=100)
     descripcion: Optional[str] = Field(default=None)
     es_alergeno: bool = Field(default=False)
-    activo: bool = Field(default=True)
-    deleted_at: Optional[datetime] = Field(
-        default=None,
-        sa_type=DateTime(timezone=True)
-    )
 
-    created_at: datetime = Field(
-        default_factory=datetime.utcnow,
-        sa_type=DateTime(timezone=True)
-    )
-    updated_at: datetime = Field(
-        default_factory=datetime.utcnow,
-        sa_type=DateTime(timezone=True)
-    )
+    created_at: datetime = Field(default_factory=datetime.utcnow, sa_type=DateTime(timezone=True))
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_type=DateTime(timezone=True))
 
-    producto_ingredientes: List["ProductoIngrediente"] = Relationship(
-        back_populates="ingrediente"
-    )
+    producto_ingredientes: List["ProductoIngrediente"] = Relationship(back_populates="ingrediente")

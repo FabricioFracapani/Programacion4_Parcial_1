@@ -1,42 +1,56 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { API } from '../services/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const checkAuth = useCallback(async () => {
+    try {
+      const data = await API.auth.me();
+      if (data?.user) {
+        setUser(data.user);
+      } else {
+        setUser(null);
+      }
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        if (decoded.exp * 1000 < Date.now()) {
-          logout();
-        } else {
-          setUser(decoded);
-        }
-      } catch {
-        logout();
-      }
-    }
-  }, [token]);
+    checkAuth();
+  }, [checkAuth]);
 
-  function login(newToken) {
-    const decoded = jwtDecode(newToken);
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
-    setUser(decoded);
+  async function login(email, password) {
+    const data = await API.auth.login(email, password);
+    if (data?.user) {
+      setUser(data.user);
+    }
+    return data;
   }
 
-  function logout() {
-    localStorage.removeItem('token');
-    setToken(null);
+  async function register(nombre, apellido, email, password, celular) {
+    const data = await API.auth.register(nombre, apellido, email, password, celular);
+    if (data?.user) {
+      setUser(data.user);
+    }
+    return data;
+  }
+
+  async function logout() {
+    try {
+      await API.auth.logout();
+    } catch {}
     setUser(null);
   }
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );

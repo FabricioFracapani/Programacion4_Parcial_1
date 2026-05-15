@@ -1,4 +1,3 @@
-# app/modules/categoria/models.py
 from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import DateTime
@@ -9,8 +8,6 @@ if TYPE_CHECKING:
 
 
 class Categoria(SQLModel, table=True):
-    """Tabla categoria en la base de datos."""
-
     __tablename__ = "categoria"
 
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -18,25 +15,9 @@ class Categoria(SQLModel, table=True):
     nombre: str = Field(unique=True, max_length=100)
     descripcion: Optional[str] = Field(default=None)
     imagen_url: Optional[str] = Field(default=None)
-    activo: bool = Field(default=True)
-    es_principal: bool = Field(default=True)
 
-    # Auditoría
-    created_at: datetime = Field(
-        default_factory=datetime.utcnow,
-        sa_type=DateTime(timezone=True)
-    )
-    updated_at: datetime = Field(
-        default_factory=datetime.utcnow,
-        sa_type=DateTime(timezone=True)
-    )
-    deleted_at: Optional[datetime] = Field(
-        default=None,
-        sa_type=DateTime(timezone=True)
-    )
+    created_at: datetime = Field(default_factory=datetime.utcnow, sa_type=DateTime(timezone=True))
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_type=DateTime(timezone=True))
+    deleted_at: Optional[datetime] = Field(default=None, sa_type=DateTime(timezone=True))
 
-    # Relationships
-    # Una Categoria puede estar en muchas filas de ProductoCategoria
-    producto_categorias: List["ProductoCategoria"] = Relationship(
-        back_populates="categoria"
-    )
+    producto_categorias: List["ProductoCategoria"] = Relationship(back_populates="categoria")

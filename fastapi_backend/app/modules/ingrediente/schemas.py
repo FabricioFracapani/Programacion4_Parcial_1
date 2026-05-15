@@ -1,34 +1,21 @@
-# app/modules/ingrediente/schemas.py
-#
-# Schemas Pydantic de entrada y salida para el módulo ingrediente.
-# Separados del modelo de tabla para respetar el principio de
-# responsabilidad única: models.py define la DB, schemas.py define
-# los contratos HTTP.
 from typing import Optional, List
-from sqlmodel import SQLModel, Field
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 
-# ── Entrada Ingrediente ───────────────────────────────────────────────────────
-
-class IngredienteCreate(SQLModel):
-    """Body para POST /ingredientes/"""
+class IngredienteCreate(BaseModel):
     nombre: str = Field(min_length=2, max_length=100)
     descripcion: Optional[str] = None
     es_alergeno: bool = False
 
 
-class IngredienteUpdate(SQLModel):
-    """Body para PATCH /ingredientes/{id} — todos los campos opcionales."""
+class IngredienteUpdate(BaseModel):
     nombre: Optional[str] = Field(default=None, min_length=2, max_length=100)
     descripcion: Optional[str] = None
     es_alergeno: Optional[bool] = None
 
 
-# ── Salida Ingrediente ────────────────────────────────────────────────────────
-
-class IngredientePublic(SQLModel):
-    """Response model: campos que se exponen al cliente."""
+class IngredientePublic(BaseModel):
     id: int
     nombre: str
     descripcion: Optional[str] = None
@@ -37,31 +24,27 @@ class IngredientePublic(SQLModel):
     updated_at: datetime
 
 
-class IngredienteList(SQLModel):
-    """Response model paginado para GET /ingredientes/"""
+class IngredienteList(BaseModel):
     data: List[IngredientePublic]
     total: int
 
 
-# ── Entrada ProductoIngrediente ───────────────────────────────────────────────
-
-class ProductoIngredienteCreate(SQLModel):
-    """Body para POST /ingredientes/producto"""
+class ProductoIngredienteCreate(BaseModel):
     producto_id: int = Field(gt=0)
     ingrediente_id: int = Field(gt=0)
+    cantidad: float = Field(default=1.0, gt=0)
+    unidad_medida_id: Optional[int] = None
     es_removible: bool = False
 
 
-# ── Salida ProductoIngrediente ────────────────────────────────────────────────
-
-class ProductoIngredientePublic(SQLModel):
-    """Response model para la relación producto ↔ ingrediente."""
+class ProductoIngredientePublic(BaseModel):
     producto_id: int
     ingrediente_id: int
+    cantidad: float
+    unidad_medida_id: Optional[int] = None
     es_removible: bool
 
 
-class ProductoIngredienteList(SQLModel):
-    """Response model paginado para GET /ingredientes/producto/{producto_id}"""
+class ProductoIngredienteList(BaseModel):
     data: List[ProductoIngredientePublic]
     total: int

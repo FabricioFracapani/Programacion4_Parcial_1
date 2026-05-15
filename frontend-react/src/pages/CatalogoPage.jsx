@@ -42,7 +42,7 @@ export default function CatalogoPage({ showToast }) {
       </div>
       <div className="catalogo-grid">
         {filtrados.map(p => {
-          const imgUrl = p.imagen_url?.[0] || PLACEHOLDER;
+          const imgUrl = p.imagenes_url?.[0] || PLACEHOLDER;
           const catsProd = relCategorias.filter(r => r.producto_id === p.id);
           const catsNombres = catsProd.map(r => {
             const cat = categorias.find(c => c.id === r.categoria_id);

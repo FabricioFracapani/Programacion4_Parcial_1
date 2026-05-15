@@ -1,5 +1,8 @@
-const API_URL = '/api';
+const API_URL = 'http://localhost:8000';
 
+// ==========================================
+// 1. SISTEMA DE LOGS Y DEBUGGING
+// ==========================================
 let debugLogs = [];
 let onDebugUpdate = () => {};
 
@@ -22,60 +25,109 @@ export function clearDebugLogs() {
   onDebugUpdate([]);
 }
 
-function getToken() {
-  return localStorage.getItem('token');
+// Función auxiliar para leer la cookie CSRF que requiere FastAPI
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
+// ==========================================
+// 2. MOTOR CENTRAL DE PETICIONES (Faltaba definirla)
+// ==========================================
 async function api(endpoint, options = {}) {
   const url = `${API_URL}${endpoint}`;
-  const token = getToken();
+  
+  // Configuración base de fetch
   const config = {
+    method: options.method || 'GET',
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
-    ...options,
+    // credentials: 'include' es VITAL para que el navegador 
+    // envíe las cookies seguras (access_token) automáticamente al backend
+    credentials: 'include', 
   };
 
-  if (options.body && typeof options.body === 'object') {
-    config.body = JSON.stringify(options.body);
+  // Inyectar el token CSRF automáticamente en mutaciones
+  if (config.method !== 'GET') {
+    const csrfToken = getCookie('csrf_token');
+    if (csrfToken) {
+      config.headers['X-CSRF-Token'] = csrfToken;
+    }
   }
 
-  addDebugLog({ type: 'request', method: options.method || 'GET', endpoint, time: new Date().toLocaleTimeString() });
-
-  const response = await fetch(url, config);
-
-  if (!response.ok) {
-    let errorMsg = 'Error en la solicitud';
-    try {
-      const error = await response.json();
-      errorMsg = error.detail || errorMsg;
-    } catch {}
-    addDebugLog({ type: 'error', message: errorMsg, time: new Date().toLocaleTimeString() });
-    throw new Error(errorMsg);
+  // Transformar el body a string si es un objeto (evitando romper FormData)
+  if (options.body) {
+    if (typeof options.body === 'object' && !(options.body instanceof FormData)) {
+      config.body = JSON.stringify(options.body);
+    } else {
+      config.body = options.body;
+    }
   }
 
-  if (response.status === 204) {
-    addDebugLog({ type: 'response', status: 204, endpoint, time: new Date().toLocaleTimeString() });
-    return null;
-  }
+  addDebugLog({ 
+    type: 'request', 
+    method: config.method, 
+    endpoint, 
+    time: new Date().toLocaleTimeString() 
+  });
 
-  const data = await response.json();
-  addDebugLog({ type: 'response', status: response.status, endpoint, time: new Date().toLocaleTimeString() });
-  return data;
+  try {
+    const response = await fetch(url, config);
+
+    // CONTROL DE ERRORES DE LA API
+    if (!response.ok) {
+      let errorMsg = `Error en la solicitud (${response.status})`;
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.detail || errorMsg;
+      } catch {
+        // Si no es un JSON, nos quedamos con el error genérico
+      }
+      
+      addDebugLog({ type: 'error', message: errorMsg, time: new Date().toLocaleTimeString() });
+      throw new Error(errorMsg);
+    }
+
+    // MANEJO CORRECTO DEL STATUS 204 (No Content)
+    if (response.status === 204) {
+      addDebugLog({ type: 'response', status: 204, endpoint, time: new Date().toLocaleTimeString() });
+      return null; 
+    }
+
+    // RESPUESTAS NORMALES CON CONTENIDO
+    const data = await response.json();
+    addDebugLog({ type: 'response', status: response.status, endpoint, time: new Date().toLocaleTimeString() });
+    return data;
+
+  } catch (error) {
+    // Captura errores de red (ej: servidor apagado)
+    addDebugLog({ type: 'error', message: error.message, time: new Date().toLocaleTimeString() });
+    throw error;
+  }
 }
 
+// ==========================================
+// 3. MÓDULOS DE LA API (Tu estructura original impecable)
+// ==========================================
 export const API = {
   auth: {
-    login(username, password) {
-      return api('/auth/login', { method: 'POST', body: { username, password } });
+    login(email, password) {
+      return api('/auth/login', { method: 'POST', body: { email, password } });
     },
-    register(username, password) {
-      return api('/auth/register', { method: 'POST', body: { username, password } });
+    register(nombre, apellido, email, password, celular) {
+      return api('/auth/register', { method: 'POST', body: { nombre, apellido, email, password, celular } });
     },
     me() {
       return api('/auth/me');
+    },
+    refresh() {
+      return api('/auth/refresh', { method: 'POST' });
+    },
+    logout() {
+      return api('/auth/logout', { method: 'POST' });
     },
   },
   productos: {
@@ -103,10 +155,10 @@ export const API = {
         body: { producto_id: productoId, categoria_id: categoriaId, es_principal: esPrincipal },
       });
     },
-    asignarIngrediente(productoId, ingredienteId, esRemovible = false) {
+    asignarIngrediente(productoId, ingredienteId, cantidad = 1, esRemovible = false) {
       return api('/productos/ingredientes', {
         method: 'POST',
-        body: { producto_id: productoId, ingrediente_id: ingredienteId, es_removible: esRemovible },
+        body: { producto_id: productoId, ingrediente_id: ingredienteId, cantidad, es_removible: esRemovible },
       });
     },
   },
@@ -137,8 +189,52 @@ export const API = {
     delete(id) {
       return api(`/ingredientes/${id}`, { method: 'DELETE' });
     },
-    getRelaciones(productoId) {
-      return api(`/ingredientes/producto/${productoId}`);
+  },
+  direcciones: {
+    list() {
+      return api('/direcciones/');
+    },
+    create(data) {
+      return api('/direcciones/', { method: 'POST', body: data });
+    },
+    update(id, data) {
+      return api(`/direcciones/${id}`, { method: 'PATCH', body: data });
+    },
+    delete(id) {
+      return api(`/direcciones/${id}`, { method: 'DELETE' });
+    },
+  },
+  pedidos: {
+    list(offset = 0, limit = 50) {
+      return api(`/pedidos/?offset=${offset}&limit=${limit}`);
+    },
+    create(data) {
+      return api('/pedidos/', { method: 'POST', body: data });
+    },
+    getById(id) {
+      return api(`/pedidos/${id}`);
+    },
+    avanzarEstado(id, estadoCodigo, motivo) {
+      return api(`/pedidos/${id}/estado`, { method: 'PATCH', body: { estado_codigo: estadoCodigo, motivo } });
+    },
+    getHistorial(id) {
+      return api(`/pedidos/${id}/historial`);
+    },
+  },
+  unidades: {
+    list() {
+      return api('/unidades-medida/');
+    },
+    create(data) {
+      return api('/unidades-medida/', { method: 'POST', body: data });
+    },
+    update(id, data) {
+      return api(`/unidades-medida/${id}`, { method: 'PATCH', body: data });
+    },
+  },
+  estados: {
+    list() {
+      return api('/estados-pedido/');
     },
   },
 };

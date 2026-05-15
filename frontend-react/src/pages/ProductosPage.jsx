@@ -17,7 +17,7 @@ export default function ProductosPage({ showToast }) {
   const [form, setForm] = useState({
     nombre: '', descripcion: '', categoria_principal: '',
     categorias_adicionales: [], ingredientes_seleccionados: [],
-    precio_base: '', stock_cantidad: '0', imagen_url: '', disponible: true,
+    precio_base: '', stock_cantidad: '0', imagenes_url: '', disponible: true,
   });
 
   async function loadData() {
@@ -49,7 +49,7 @@ export default function ProductosPage({ showToast }) {
     setForm({
       nombre: '', descripcion: '', categoria_principal: '',
       categorias_adicionales: [], ingredientes_seleccionados: [],
-      precio_base: '', stock_cantidad: '0', imagen_url: '', disponible: true,
+      precio_base: '', stock_cantidad: '0', imagenes_url: '', disponible: true,
     });
     setShowModal(true);
   }
@@ -67,7 +67,7 @@ export default function ProductosPage({ showToast }) {
       categorias_adicionales: adicionales,
       ingredientes_seleccionados: ingsProd,
       precio_base: String(p.precio_base), stock_cantidad: String(p.stock_cantidad || 0),
-      imagen_url: p.imagen_url?.[0] || '', disponible: p.disponible,
+      imagenes_url: p.imagenes_url?.[0] || '', disponible: p.disponible,
     });
     setShowModal(true);
   }
@@ -83,7 +83,7 @@ export default function ProductosPage({ showToast }) {
       descripcion: form.descripcion || null,
       precio_base: parseFloat(form.precio_base),
       stock_cantidad: parseInt(form.stock_cantidad) || 0,
-      imagen_url: form.imagen_url ? [form.imagen_url] : [],
+      imagenes_url: form.imagenes_url ? [form.imagenes_url] : [],
       disponible: form.disponible,
     };
     try {
@@ -236,7 +236,7 @@ export default function ProductosPage({ showToast }) {
               </div>
               <div className="form-group">
                 <label>URL de Imagen</label>
-                <input value={form.imagen_url} onChange={e => setForm({...form, imagen_url: e.target.value})}
+                <input value={form.imagenes_url} onChange={e => setForm({...form, imagenes_url: e.target.value})}
                   placeholder="https://ejemplo.com/imagen.jpg" />
               </div>
               <div className="form-group checkbox-group">
